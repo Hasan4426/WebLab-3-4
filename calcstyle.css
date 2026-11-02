@@ -1,0 +1,10 @@
+*{box-sizing:border-box}
+body{margin:0;padding:45px 16px;background:#e8e5dc;font-family:Arial,sans-serif}
+.calculator{width:min(100%,340px);margin:auto;padding:18px;background:#bdcbd0;border:2px solid #78888e;border-radius:5px}
+h1{color:#263d49;font-size:24px;text-align:center;margin:4px 0 20px}
+.display{display:block;width:100%;min-height:70px;background:#eef1df;border:2px inset #a5ad99;color:#26332b;padding:14px 10px;text-align:right;font:32px 'Courier New',monospace;overflow:hidden;margin-bottom:16px}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+button{min-height:54px;border:1px solid #839096;border-radius:3px;background:#f1f1ed;color:#222;font-size:21px;cursor:pointer}
+button:hover{background:#fff}button:active{background:#d0d9dd}button:focus-visible{outline:3px solid #365c74;outline-offset:2px}
+.operator{background:#7799ac;color:#102e40;font-weight:bold}.operator:hover{background:#9cb7c6}.utility{background:#d5aaa1}.zero{grid-column:span 2}
+.hint{color:#364c58;text-align:center;font-size:12px;line-height:1.6;margin:18px 0 2px}

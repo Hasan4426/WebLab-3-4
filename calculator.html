@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Interactive Calculator</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:45px 16px;background:#e8e5dc;font-family:Arial,sans-serif}
+.calculator{width:min(100%,340px);margin:auto;padding:18px;background:#bdcbd0;border:2px solid #78888e;border-radius:5px}
+h1{color:#263d49;font-size:24px;text-align:center;margin:4px 0 20px}
+.display{display:block;width:100%;min-height:70px;background:#eef1df;border:2px inset #a5ad99;color:#26332b;padding:14px 10px;text-align:right;font:32px 'Courier New',monospace;overflow:hidden;margin-bottom:16px}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+button{min-height:54px;border:1px solid #839096;border-radius:3px;background:#f1f1ed;color:#222;font-size:21px;cursor:pointer}
+button:hover{background:#fff}button:active{background:#d0d9dd}button:focus-visible{outline:3px solid #365c74;outline-offset:2px}
+.operator{background:#7799ac;color:#102e40;font-weight:bold}.operator:hover{background:#9cb7c6}.utility{background:#d5aaa1}.zero{grid-column:span 2}
+.hint{color:#364c58;text-align:center;font-size:12px;line-height:1.6;margin:18px 0 2px}
+</style>
+</head>
+<body>
+<main class="calculator" aria-label="Calculator">
+<h1>Simple Calculator</h1>
+<output id="display" class="display" aria-live="polite" aria-label="Result">0</output>
+<div class="keys">
+<button class="utility" data-key="clear">AC</button><button data-key="00">00</button><button data-key="percent" aria-label="Percent">%</button><button class="operator" data-key="/" aria-label="Divide">÷</button>
+<button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button><button class="operator" data-key="*" aria-label="Multiply">×</button>
+<button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button><button class="operator" data-key="-" aria-label="Subtract">−</button>
+<button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button><button class="operator" data-key="+" aria-label="Add">+</button>
+<button class="zero" data-key="0">0</button><button data-key="." aria-label="Decimal point">.</button><button class="operator" data-key="=" aria-label="Equals">=</button>
+</div>
+<p class="hint">Keyboard: numbers, + − * / and Enter<br>Escape to clear · Backspace to delete</p>
+</main>
+<script>
+// DOM: select the display and keypad.
+const display = document.querySelector('#display');
+let current = '0', previous = null, operator = null, fresh = true;
+function reset(){current='0';previous=null;operator=null;fresh=true;}
+function format(value){return Number.isFinite(value) ? String(Number(value.toPrecision(12))) : 'Error';}
+function calculate(a,b,op){
+  switch(op){case '+':return a+b;case '-':return a-b;case '*':return a*b;case '/':return b===0?NaN:a/b;}
+}
+// Logic: operations are evaluated sequentially, like a basic pocket calculator.
+function input(key){
+  if(key==='clear') reset();
+  else {
+    if(current==='Error') reset();
+    if(/^\d+$/.test(key)){
+      if(fresh){current='0';fresh=false;}
+      if(current.replace(/[-.]/g,'').length+key.length<=12) current=current==='0'?String(Number(key)):current+key;
+    } else if(key==='.'){
+      if(fresh){current='0';fresh=false;}
+      if(!current.includes('.')) current+='.';
+    } else if(key==='percent') current=format(Number(current)/100);
+    else if(key==='backspace'){
+      if(!fresh) current=current.length>1?current.slice(0,-1):'0';
+    } else if(['+','-','*','/'].includes(key)){
+      if(operator!==null&&!fresh) current=format(calculate(previous,Number(current),operator));
+      previous=Number(current);operator=key;fresh=true;
+      if(current==='Error'){previous=null;operator=null;}
+    } else if(key==='='&&operator!==null){
+      current=format(calculate(previous,Number(current),operator));previous=null;operator=null;fresh=true;
+    }
+  }
+  display.textContent=current;
+}
+// Events: mouse/touch and keyboard share the same logic.
+document.querySelector('.keys').addEventListener('click',event=>{
+  const button=event.target.closest('button');if(button) input(button.dataset.key);
+});
+document.addEventListener('keydown',event=>{
+  const aliases={Enter:'=',Escape:'clear',Backspace:'backspace','%':'percent'};
+  const key=aliases[event.key]||event.key;
+  if(event.ctrlKey||event.metaKey||event.altKey)return;
+  if(/^[0-9.+*/=-]$/.test(key)||Object.values(aliases).includes(key)){event.preventDefault();input(key);}
+});
+</script>
+</body>
+</html>
